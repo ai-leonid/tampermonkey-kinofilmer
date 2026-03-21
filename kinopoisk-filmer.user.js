@@ -13,8 +13,16 @@
 // ==/UserScript==
 
 let lastUrl = location.href;
-const playerButtonWrapperId = 'watch-player-button-wrapper';
-const playerButtonId = 'watch-player-button';
+const ui = {
+    wrapperClass: 'kifi-player-button-wrapper',
+    buttonClass: 'kifi-player-button',
+    selectClass: 'kifi-player-source'
+};
+const uiSelectors = {
+    wrapper: `.${ui.wrapperClass}`,
+    button: `.${ui.buttonClass}`,
+    select: `.${ui.selectClass}`
+};
 const movieTypes = ['film', 'series'];
 const providers = [
     {
@@ -48,11 +56,11 @@ const providers = [
         buildUrl: (movieId, movieType) => `https://www.kinopoisk.fun/${movieType}/${movieId}/`
     }
 ];
-const tailImage = `<svg width="100%" height="100%" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><defs><linearGradient id="tail-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1f1f1f"/><stop offset="1" stop-color="#0b0b0b"/></linearGradient><linearGradient id="tail-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffcf2d"/><stop offset="1" stop-color="#ffb300"/></linearGradient></defs><rect x="8" y="8" width="112" height="112" rx="26" fill="url(#tail-bg)"/><path d="M52 44L52 84L88 64L52 44Z" fill="url(#tail-accent)"/></svg>`;
+const playImage = `<svg width="100%" height="100%" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><defs><linearGradient id="tail-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#876af1"/><stop offset="1" stop-color="#0b0b0b"/></linearGradient><linearGradient id="play-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f7c62d"/><stop offset="1" stop-color="#ffb300"/></linearGradient></defs><rect x="8" y="8" width="112" height="112" rx="26" fill="url(#tail-bg)"/><path d="M52 44L52 84L88 64L52 44Z" fill="url(#play-accent)"/></svg>`;
 
 
 const stylesCommon = `
-    #watch-player-button-wrapper {
+    ${uiSelectors.wrapper} {
       left: 16px;
       bottom: 16px;
       position: fixed;
@@ -61,7 +69,7 @@ const stylesCommon = `
       align-items: center;
       gap: 8px;
     }
-    #watch-player-button {
+    ${uiSelectors.button} {
       width: 52px;
       height: 52px;
       outline: none;
@@ -70,9 +78,9 @@ const stylesCommon = `
       filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.45));
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
-    #watch-player-source {
+    ${uiSelectors.select} {
       height: 40px;
-      padding: 0 12px;
+      padding: 0 34px 0 12px;
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.12);
       background: rgba(20, 20, 20, 0.92);
@@ -82,6 +90,12 @@ const stylesCommon = `
       outline: none;
       cursor: pointer;
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'><path d='M1 1.5L6 6.5L11 1.5' stroke='%23cfcfcf' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
     }`;
 
 function mountPlayer(siteUrl) {
@@ -109,8 +123,8 @@ function attachTailEvents(wrapper) {
     if (wrapper.dataset.bound === '1') {
         return;
     }
-    const button = wrapper.querySelector(`#${playerButtonId}`);
-    const select = wrapper.querySelector('#watch-player-source');
+    const button = wrapper.querySelector(uiSelectors.button);
+    const select = wrapper.querySelector(uiSelectors.select);
     button.addEventListener('click', () => {
         const movieId = wrapper.dataset.movieId;
         const movieType = wrapper.dataset.movieType;
@@ -127,7 +141,7 @@ function attachTailEvents(wrapper) {
 
 function createProviderSelect(defaultProviderId) {
     const select = document.createElement('select');
-    select.id = 'watch-player-source';
+    select.className = ui.selectClass;
     providers.forEach((provider) => {
         const option = document.createElement('option');
         option.value = provider.id;
@@ -141,13 +155,13 @@ function createProviderSelect(defaultProviderId) {
 }
 
 function ensureTail(movieId, movieType) {
-    let wrapper = document.getElementById(playerButtonWrapperId);
+    let wrapper = document.querySelector(uiSelectors.wrapper);
     if (!wrapper) {
         wrapper = document.createElement('div');
-        wrapper.id = playerButtonWrapperId;
+        wrapper.className = ui.wrapperClass;
         const button = document.createElement('div');
-        button.id = playerButtonId;
-        button.innerHTML = tailImage;
+        button.className = ui.buttonClass;
+        button.innerHTML = playImage;
         const select = createProviderSelect('reyohoho');
         wrapper.appendChild(button);
         wrapper.appendChild(select);
@@ -160,7 +174,7 @@ function ensureTail(movieId, movieType) {
 }
 
 function removeTail() {
-    const wrapper = document.getElementById(playerButtonWrapperId);
+    const wrapper = document.querySelector(uiSelectors.wrapper);
     if (wrapper) {
         wrapper.remove();
     }
