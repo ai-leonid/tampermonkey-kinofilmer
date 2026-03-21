@@ -1,14 +1,14 @@
 // ==UserScript==
-// @name         Kinopoisk Filmer
-// @namespace    https://github.com/ai-leonid/kinopoisk-filmer/
-// @homepage     https://github.com/ai-leonid/kinopoisk-filmer/
+// @name         KinoFilmer movie watcher
+// @namespace    https://github.com/ai-leonid/kinofilmer/
+// @homepage     https://github.com/ai-leonid/kinofilmer/
 // @version      0.6
 // @description  Bookmark to film view from kinopoisk.ru
 // @author       ai-leonid
 // @match        *://*.kinopoisk.ru/*
-// @icon         https://github.com/ai-leonid/kinopoisk-filmer/raw/master/images/icon128.png
-// @downloadURL  https://github.com/ai-leonid/kinopoisk-filmer/raw/main/kinopoisk-filmer.user.js
-// @updateURL    https://github.com/ai-leonid/kinopoisk-filmer/raw/main/kinopoisk-filmer.user.js
+// @icon         https://github.com/ai-leonid/kinofilmer/raw/master/images/icon128.png
+// @downloadURL  https://github.com/ai-leonid/kinofilmer/raw/main/kinofilmer.user.js
+// @updateURL    https://github.com/ai-leonid/kinofilmer/raw/main/kinofilmer.user.js
 // @run-at       document-end
 // ==/UserScript==
 
@@ -54,6 +54,11 @@ const providers = [
         id: 'kp-fun',
         label: 'Kinopoisk.fun',
         buildUrl: (movieId, movieType) => `https://www.kinopoisk.fun/${movieType}/${movieId}/`
+    },
+    {
+        id: 'tapeoperator',
+        label: 'tapeop.dev',
+        buildUrl: (movieId, movieType) => `https://tapeoperator.surge.sh/?movie=${movieId}/`
     }
 ];
 const playImage = `<svg width="100%" height="100%" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><defs><linearGradient id="kifi-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#67d985"/><stop offset="1" stop-color="#3a3a3aff"/></linearGradient><linearGradient id="kifi-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fefefe"/><stop offset="1" stop-color="#e9e1e1ff"/></linearGradient></defs><rect x="8" y="8" width="112" height="112" rx="26" fill="url(#kifi-bg)"/><path d="M52 44L52 84L88 64L52 44Z" fill="url(#kifi-accent)"/></svg>`;
