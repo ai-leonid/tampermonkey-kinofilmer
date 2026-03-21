@@ -1,14 +1,15 @@
 // ==UserScript==
 // @name         KinoFilmer movie watcher
-// @namespace    https://github.com/ai-leonid/kinofilmer/
-// @homepage     https://github.com/ai-leonid/kinofilmer/
-// @version      0.6
-// @description  Bookmark to film view from kinopoisk.ru
+// @namespace    https://github.com/ai-leonid/tampermonkey-kinofilmer/
+// @homepage     https://github.com/ai-leonid/tampermonkey-kinofilmer/
+// @version      0.1
+// @description  Button for film view from kinopoisk.ru and imdb.com
 // @author       ai-leonid
 // @match        *://*.kinopoisk.ru/*
-// @icon         https://github.com/ai-leonid/kinofilmer/raw/master/images/icon128.png
-// @downloadURL  https://github.com/ai-leonid/kinofilmer/raw/main/kinofilmer.user.js
-// @updateURL    https://github.com/ai-leonid/kinofilmer/raw/main/kinofilmer.user.js
+// @match        *://*.imdb.com/*
+// @icon         https://github.com/ai-leonid/tampermonkey-kinofilmer/raw/main/images/icon-128.png
+// @downloadURL  https://github.com/ai-leonid/tampermonkey-kinofilmer/raw/main/kinofilmer.user.js
+// @updateURL    https://github.com/ai-leonid/tampermonkey-kinofilmer/raw/main/kinofilmer.user.js
 // @run-at       document-end
 // ==/UserScript==
 
@@ -23,7 +24,7 @@ const uiSelectors = {
     button: `.${ui.buttonClass}`,
     select: `.${ui.selectClass}`
 };
-const movieTypes = ['film', 'series'];
+const movieTypes = ['film', 'series', 'title'];
 const providers = [
     {
         id: 'reyohoho',
@@ -57,7 +58,7 @@ const providers = [
     },
     {
         id: 'tapeoperator',
-        label: 'tapeop.dev',
+        label: 'tapeoperator',
         buildUrl: (movieId, movieType) => `https://tapeoperator.surge.sh/?movie=${movieId}/`
     }
 ];
@@ -117,6 +118,12 @@ function buildUrl(movieId, movieType, providerId) {
 }
 
 function getMovieInfo() {
+    const host = window.location.host;
+    if (host.includes('imdb.com')) {
+        const match = window.location.pathname.match(/^\/(title)\/(tt\d+)/);
+        if (!match) return null;
+        return { movieType: match[1], movieId: `imdb=${match[2]}` };
+    }
     const match = window.location.pathname.match(/\/(film|series)\/(\d+)/);
     if (!match) {
         return null;
@@ -144,10 +151,13 @@ function attachKifiButtonEvents(wrapper) {
     wrapper.dataset.bound = '1';
 }
 
-function createProviderSelect(defaultProviderId) {
+function createProviderSelect(defaultProviderId, movieType) {
     const select = document.createElement('select');
     select.className = ui.selectClass;
-    providers.forEach((provider) => {
+    const availableProviders = (movieType === 'title')
+        ? providers.filter(p => p.id === 'reyohoho')
+        : providers;
+    availableProviders.forEach((provider) => {
         const option = document.createElement('option');
         option.value = provider.id;
         option.textContent = provider.label;
@@ -156,6 +166,9 @@ function createProviderSelect(defaultProviderId) {
         }
         select.appendChild(option);
     });
+    if (availableProviders.length <= 1) {
+        select.style.display = 'none';
+    }
     return select;
 }
 
@@ -167,7 +180,7 @@ function ensureKifiButton(movieId, movieType) {
         const button = document.createElement('div');
         button.className = ui.buttonClass;
         button.innerHTML = playImage;
-        const select = createProviderSelect('reyohoho');
+        const select = createProviderSelect('reyohoho', movieType);
         wrapper.appendChild(button);
         wrapper.appendChild(select);
         document.body.appendChild(wrapper);
@@ -185,10 +198,10 @@ function removeKifiButton() {
     }
 }
 
-function kinopoiskPageHandler() {
+function pageHandler() {
     const info = getMovieInfo();
     if (!info) {
-        console.error('Watch kinopoisk wrong movie data');
+        console.error('Watch movie wrong data');
         removeKifiButton();
         return;
     }
@@ -203,14 +216,14 @@ new MutationObserver(() => {
     const url = location.href;
     if (url !== lastUrl) {
         lastUrl = url;
-        kinopoiskPageHandler();
+        pageHandler();
     }
 }).observe(document, {
     subtree: true,
     childList: true
 });
 
-window.addEventListener('load', kinopoiskPageHandler)
+window.addEventListener('load', pageHandler)
 
 if (typeof GM_addStyle === 'undefined') {
     GM_addStyle = (aCss) => {
