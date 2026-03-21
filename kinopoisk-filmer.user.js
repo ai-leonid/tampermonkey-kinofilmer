@@ -56,7 +56,7 @@ const providers = [
         buildUrl: (movieId, movieType) => `https://www.kinopoisk.fun/${movieType}/${movieId}/`
     }
 ];
-const playImage = `<svg width="100%" height="100%" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><defs><linearGradient id="tail-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#876af1"/><stop offset="1" stop-color="#0b0b0b"/></linearGradient><linearGradient id="play-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f7c62d"/><stop offset="1" stop-color="#ffb300"/></linearGradient></defs><rect x="8" y="8" width="112" height="112" rx="26" fill="url(#tail-bg)"/><path d="M52 44L52 84L88 64L52 44Z" fill="url(#play-accent)"/></svg>`;
+const playImage = `<svg width="100%" height="100%" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><defs><linearGradient id="kifi-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#67d985"/><stop offset="1" stop-color="#3a3a3aff"/></linearGradient><linearGradient id="kifi-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fefefe"/><stop offset="1" stop-color="#e9e1e1ff"/></linearGradient></defs><rect x="8" y="8" width="112" height="112" rx="26" fill="url(#kifi-bg)"/><path d="M52 44L52 84L88 64L52 44Z" fill="url(#kifi-accent)"/></svg>`;
 
 
 const stylesCommon = `
@@ -119,7 +119,7 @@ function getMovieInfo() {
     return { movieType: match[1], movieId: match[2] };
 }
 
-function attachTailEvents(wrapper) {
+function attachKifiButtonEvents(wrapper) {
     if (wrapper.dataset.bound === '1') {
         return;
     }
@@ -154,7 +154,7 @@ function createProviderSelect(defaultProviderId) {
     return select;
 }
 
-function ensureTail(movieId, movieType) {
+function ensureKifiButton(movieId, movieType) {
     let wrapper = document.querySelector(uiSelectors.wrapper);
     if (!wrapper) {
         wrapper = document.createElement('div');
@@ -170,10 +170,10 @@ function ensureTail(movieId, movieType) {
     wrapper.dataset.movieId = movieId;
     wrapper.dataset.movieType = movieType;
     wrapper.dataset.providerId = wrapper.dataset.providerId || 'reyohoho';
-    attachTailEvents(wrapper);
+    attachKifiButtonEvents(wrapper);
 }
 
-function removeTail() {
+function removeKifiButton() {
     const wrapper = document.querySelector(uiSelectors.wrapper);
     if (wrapper) {
         wrapper.remove();
@@ -184,13 +184,13 @@ function kinopoiskPageHandler() {
     const info = getMovieInfo();
     if (!info) {
         console.error('Watch kinopoisk wrong movie data');
-        removeTail();
+        removeKifiButton();
         return;
     }
     if (movieTypes.includes(info.movieType)) {
-        ensureTail(info.movieId, info.movieType);
+        ensureKifiButton(info.movieId, info.movieType);
     } else {
-        removeTail();
+        removeKifiButton();
     }
 }
 
