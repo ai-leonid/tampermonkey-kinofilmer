@@ -2,7 +2,7 @@
 // @name         KinoFilmer movie watcher
 // @namespace    https://github.com/ai-leonid/tampermonkey-kinofilmer/
 // @homepage     https://github.com/ai-leonid/tampermonkey-kinofilmer/
-// @version      0.1
+// @version      0.1.1
 // @description  Button for film view from kinopoisk.ru and imdb.com
 // @author       ai-leonid
 // @match        *://*.kinopoisk.ru/*
@@ -29,7 +29,7 @@ const providers = [
     {
         id: 'reyohoho',
         label: 'Reyohoho',
-        buildUrl: (movieId) => `https://dav2010id.github.io/reyohoho/movie/${movieId}`
+        buildUrl: (movieId) => `https://reyhoho.fun/movie/${movieId}`
     },
     {
         id: 'kinohub',
